@@ -1,17 +1,42 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Task } from "./task.model";
+import { UpdateTaskDto } from "./task.dto";
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
+  private tasks: Task[] = []
 
-  getAllTasks(): Task[] {}
+  getAllTasks(): Task[] {
+    return this.tasks
+  }
 
-  getTaskById(id: string): Task {}
+  getTaskById(id: string): Task {
+    const task = this.tasks.find(task => task.id === id)
+    if (!task) throw new NotFoundException()
 
-  createTask(task: Task): Task {}
+    return this.tasks.find((task) => task.id === id)
+  }
 
-  updateTask(id: string, update: Task): Task {}
+  createTask(task: Task): Task {
+    const newTask = {
+      id: 'task_' + this.tasks.length + 1,
+      ...task,
+    }
+    this.tasks.push(newTask)
+    return newTask
+  }
 
-  deleteTask(id: string): Task {}
+  updateTask(id: string, update: UpdateTaskDto): Task {
+    const taskToUpdate = this.tasks.find(task => task.id === id)
+    if (!taskToUpdate) throw new NotFoundException()
+
+    return Object.assign(taskToUpdate, update);
+  }
+
+  deleteTask(id: string): Task {
+    const taskToDeleteIndex = this.tasks.findIndex(task => task.id === id);
+    if (taskToDeleteIndex === -1) throw new NotFoundException();
+
+    return this.tasks.splice(taskToDeleteIndex, 1).at(0);
+  }
 }
